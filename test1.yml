@@ -1,19 +1,21 @@
----
 - name: Obtener y parsear LLDP neighbors
   hosts: all
   gather_facts: no
   connection: network_cli
 
   tasks:
-    
-    - name: Ejecutar comando y parsear con cli_command + TextFSM
+    - name: Ejecutar comando show lldp neighbors detail
       cisco.ios.ios_command:
         commands:
           - show lldp neighbors detail
-        use_textfsm: yes
-      register: output
+      register: raw_output
 
+    - name: Parsear salida con TextFSM (usando cli_parse)
+      ansible.netcommon.cli_parse:
+        command: show lldp neighbors detail
+        output: "{{ raw_output.stdout[0] }}"
+      register: parsed_output
 
     - name: Mostrar resultado parseado
       debug:
-        var: output
+        var: parsed_output
