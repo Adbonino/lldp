@@ -17,6 +17,11 @@
             | select('match', '^[a-zA-Z0-9\\-\\.]+\\s+Eth\\d+/\\d+') 
             | list
           }}
+      register: lldp_filtrar
+
+    - name: Mostrar lista de vecinos LLDP parseados
+      debug:
+        var: lldp_filtrar
 
     - name: Parsear líneas en diccionarios
       set_fact:
@@ -24,15 +29,14 @@
           {{
             lldp_raw.stdout[0]
             | split('\n')
-            | reject('search', '^Capability|^Device ID|^Total entries|^$')  # Quitar cabeceras y líneas vacías
+            | reject('search', '^Capability|^Device ID|^Total entries|^$')
             | map('regex_search', '^(\\S+)\\s+(Eth\\S+)\\s+\\d+\\s+\\S+\\s+(Eth\\S+)', '\\1,\\2,\\3')
-            | reject('equalto', None)       # Quitar líneas que no matchean
-            | map('split', ',')             # Separar los campos
-            | map('list')  
+            | reject('equalto', None)
+            | map('split', ',')
+            | map('list')
             | map('combine', ['device_id', 'local_interface', 'port_id'])
             | list
           }}
-
 
     - name: Mostrar lista de vecinos LLDP parseados
       debug:
