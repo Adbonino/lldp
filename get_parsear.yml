@@ -9,7 +9,7 @@
           - show lldp neighbors
       register: lldp_raw
 
-     - name: Mostrar lista de vecinos LLDP parseados
+    - name: Mostrar lista de vecinos LLDP parseados
       debug:
         var: lldp_raw
 
