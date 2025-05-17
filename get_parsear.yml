@@ -13,12 +13,12 @@
       debug:
         var: lldp_raw
 
-    - name: Filtrar líneas con vecinos LLDP (ignorando cabeceras)
+    - name: Filtrar líneas con vecinos LLDP (líneas que contienen Eth)
       set_fact:
         lldp_lines: >-
           {{
             lldp_raw.stdout[0].split('\n')
-            | select('search', '^[-\\w\\.]+\\s+Eth\\d+/\\d+')
+            | select('search', 'Eth')
             | list
           }}
       register: lldp_filtrar
