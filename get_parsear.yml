@@ -20,7 +20,7 @@
       set_fact:
         lldp_lines: >-
           {{
-            (lldp_raw.stdout_lines if lldp_raw.stdout is string else (lldp_raw.stdout[0] | default('')))
+            (lldp_raw.stdout_lines[0] if lldp_raw.stdout is string else (lldp_raw.stdout[0] | default('')))
             .split('\n')
             | select('search', 'Eth')
             | list
