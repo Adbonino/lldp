@@ -1,4 +1,4 @@
-- name: Obtener y parsear LLDP neighbors
+- name: Obtener LLDP neighbors sin parseo
   hosts: all
   gather_facts: no
   connection: network_cli
@@ -10,12 +10,6 @@
           - show lldp neighbors detail
       register: raw_output
 
-    - name: Parsear salida con TextFSM (usando cli_parse)
-      ansible.netcommon.cli_parse:
-        command: show lldp neighbors detail
-        output: "{{ raw_output.stdout[0] }}"
-      register: parsed_output
-
-    - name: Mostrar resultado parseado
+    - name: Mostrar salida cruda
       debug:
-        var: parsed_output
+        var: raw_output.stdout[0]
