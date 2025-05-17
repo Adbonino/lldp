@@ -13,3 +13,11 @@
     - name: Mostrar vecinos extraidos
       debug:
         var: lldp_output
+
+    - name: Extraer nombres de vecinos LLDP
+       set_fact:
+         lldp_neighbors: "{{ lldp_output.stdout[0] | regex_findall('Device ID\\s*:\\s*(\\S+)') }}"
+
+    - name: Mostrar vecinos extraidos
+      debug:
+        var: lldp_output
