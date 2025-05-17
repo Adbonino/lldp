@@ -35,7 +35,8 @@
       debug:
         var: lldp_list
 
-    - name: Guardar vecinos LLDP en archivo JSON
+    - name: Guardar vecinos LLDP en archivo JSON local
       copy:
         content: "{{ lldp_list | to_nice_json }}"
         dest: "./lldp_{{ inventory_hostname }}.json"
+      delegate_to: localhost
