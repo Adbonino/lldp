@@ -1,24 +1,19 @@
-- name: Obtener y parsear LLDP neighbors
+- name: Obtener y parsear LLDP neighbors sin Python
   hosts: all
   gather_facts: no
   connection: network_cli
-  collections:
-    - ansible.netcommon
 
   tasks:
-    - name: Ejecutar comando con ios_command (sin parseo)
+    - name: Ejecutar comando show lldp neighbors detail
       cisco.ios.ios_command:
         commands:
           - show lldp neighbors detail
-      register: raw_output
+      register: lldp_output
 
-    - name: Parsear salida con cli_parse y TextFSM
-      ansible.netcommon.cli_parse:
-        platform: cisco.ios
-        command: show lldp neighbors detail
-        output: "{{ raw_output.stdout[0] }}"
-      register: parsed_output
+    - name: Extraer nombres de vecinos LLDP
+      set_fact:
+        lldp_neighbors: "{{ lldp_output.stdout[0] | regex_findall('Device ID: ([^\\n]+)') }}"
 
-    - name: Mostrar salida parseada
+    - name: Mostrar vecinos extraidos
       debug:
-        var: parsed_output.parsed
+        var: lldp_neighbors
