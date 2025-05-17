@@ -16,8 +16,19 @@
 
     - name: Extraer nombres de vecinos LLDP
       set_fact:
-         lldp_neighbors: "{{ lldp_output.stdout_lines[0][4:-1] }}"
+         lldp_lines: "{{ lldp_output.stdout_lines[0][4:-1] }}"
 
-    - name: Mostrar vecinos extraidos
+    - name: Construir lista de diccionarios con campos Device ID, Hold-time y Port ID
+      set_fact:
+        lldp_json: >-
+          {{
+            lldp_lines | 
+            map('regex_search', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | 
+            map('list') |
+            map('zip', ['device_id', 'hold_time', 'port_id']) |
+            map('items2dict') | list
+          }}
+
+    - name: Mostrar JSON construido
       debug:
-        var: lldp_neighbors
+        var: lldp_json
