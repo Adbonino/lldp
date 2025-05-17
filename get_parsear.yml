@@ -7,7 +7,7 @@
       ansible.utils.cli_parse:
         command: show lldp neighbors
         parser:
-          name: ansible.netcommon.parsers.textfsm
+          name: ansible.utils.cli_parse.parsers.textfsm
         set_fact: lldp_data
       register: parsed_lldp
 
