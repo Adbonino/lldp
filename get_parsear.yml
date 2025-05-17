@@ -1,5 +1,5 @@
 ---
-- name: Obtener vecinos LLDP y parsear salida
+- name: Obtener y parsear vecinos LLDP
   hosts: all
   gather_facts: no
   tasks:
@@ -9,13 +9,21 @@
           - show lldp neighbors
       register: lldp_raw
 
-    - name: Parsear salida LLDP neighbors en lista de dicts
+    - name: Filtrar líneas con vecinos LLDP (ignorando cabeceras)
+      set_fact:
+        lldp_lines: >-
+          {{
+            lldp_raw.stdout[0].split('\n')
+            | select('match', '^[a-zA-Z0-9\\-\\.]+\\s+Eth\\d+/\\d+') 
+            | list
+          }}
+
+    - name: Parsear líneas en diccionarios
       set_fact:
         lldp_list: >-
           {{
-            lldp_raw.stdout[0].split('\n')
-            | select('match', '^[^ ]')    # Líneas que empiezan con palabra (device id)
-            | map('regex_search', '^(\\S+)\\s+(\\S+)\\s+\\d+\\s+\\S+\\s+(\\S+)', '\\1,\\2,\\3')
+            lldp_lines
+            | map('regex_search', '^(\\S+)\\s+(Eth\\S+)\\s+\\d+\\s+\\S+\\s+(Eth\\S+)', '\\1,\\2,\\3')
             | reject('equalto', None)
             | map('split', ',')
             | map('list')
@@ -23,8 +31,11 @@
             | list
           }}
 
-    - name: Guardar resultado como JSON local
+    - name: Mostrar lista de vecinos LLDP parseados
+      debug:
+        var: lldp_list
+
+    - name: Guardar vecinos LLDP en archivo JSON
       copy:
         content: "{{ lldp_list | to_nice_json }}"
-        dest: "./lldp_neighbors_{{ inventory_hostname }}.json"
-      delegate_to: localhost
+        dest: "./lldp_{{ inventory_hostname }}.json"
