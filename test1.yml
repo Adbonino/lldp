@@ -10,10 +10,12 @@
     
     - name: Ejecutar comando y parsear con cli_command + TextFSM
       cisco.ios.ios_command:
-        command: show lldp neighbors detail
+        commands:
+          - show lldp neighbors detail
         use_textfsm: yes
-      register: parsed_output
+      register: output
+
 
     - name: Mostrar resultado parseado
       debug:
-        var: parsed_lldp.parsed
+        var: output
