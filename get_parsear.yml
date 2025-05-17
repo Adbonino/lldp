@@ -14,7 +14,7 @@
         lldp_lines: >-
           {{
             lldp_raw.stdout[0].split('\n')
-            | select('search', '^[\\w\\-.]+\\s+Eth\\d+/\\d+')
+            | select('search', '^[-\\w\\.]+\\s+Eth\\d+/\\d+')
             | list
           }}
       register: lldp_filtrar
