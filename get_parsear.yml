@@ -22,14 +22,17 @@
       set_fact:
         lldp_list: >-
           {{
-            lldp_lines
+            lldp_raw.stdout[0]
+            | split('\n')
+            | reject('search', '^Capability|^Device ID|^Total entries|^$')  # Quitar cabeceras y líneas vacías
             | map('regex_search', '^(\\S+)\\s+(Eth\\S+)\\s+\\d+\\s+\\S+\\s+(Eth\\S+)', '\\1,\\2,\\3')
-            | reject('equalto', None)
-            | map('split', ',')
-            | map('list')
+            | reject('equalto', None)       # Quitar líneas que no matchean
+            | map('split', ',')             # Separar los campos
+            | map('list')  
             | map('combine', ['device_id', 'local_interface', 'port_id'])
             | list
           }}
+
 
     - name: Mostrar lista de vecinos LLDP parseados
       debug:
