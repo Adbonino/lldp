@@ -1,18 +1,30 @@
 ---
-- name: Obtener y parsear vecinos LLDP
+- name: Obtener vecinos LLDP y parsear salida
   hosts: all
   gather_facts: no
   tasks:
-    - name: Ejecutar y parsear show lldp neighbors
-      ansible.utils.cli_parse:
-        command: show lldp neighbors
-        parser:
-          name: ansible.utils.cli_parse.parsers.textfsm
-        set_fact: lldp_data
-      register: parsed_lldp
+    - name: Ejecutar show lldp neighbors
+      cisco.ios.ios_command:
+        commands:
+          - show lldp neighbors
+      register: lldp_raw
 
-    - name: Guardar LLDP parseado como JSON
+    - name: Parsear salida LLDP neighbors en lista de dicts
+      set_fact:
+        lldp_list: >-
+          {{
+            lldp_raw.stdout[0].split('\n')
+            | select('match', '^[^ ]')    # Líneas que empiezan con palabra (device id)
+            | map('regex_search', '^(\\S+)\\s+(\\S+)\\s+\\d+\\s+\\S+\\s+(\\S+)', '\\1,\\2,\\3')
+            | reject('equalto', None)
+            | map('split', ',')
+            | map('list')
+            | map('combine', ['device_id', 'local_interface', 'port_id'])
+            | list
+          }}
+
+    - name: Guardar resultado como JSON local
       copy:
-        content: "{{ parsed_lldp.ansible_facts.lldp_data | to_nice_json }}"
-        dest: "./lldp_parsed_{{ inventory_hostname }}.json"
+        content: "{{ lldp_list | to_nice_json }}"
+        dest: "./lldp_neighbors_{{ inventory_hostname }}.json"
       delegate_to: localhost
