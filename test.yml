@@ -1,0 +1,19 @@
+---
+- name: Prueba guardar JSON local
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Crear variable de prueba
+      set_fact:
+        prueba:
+          - device_id: "dispositivo1"
+            local_interface: "Eth1/1"
+            port_id: "Eth1/2"
+          - device_id: "dispositivo2"
+            local_interface: "Eth1/3"
+            port_id: "Eth1/4"
+
+    - name: Guardar archivo JSON localmente
+      copy:
+        content: "{{ prueba | to_nice_json }}"
+        dest: "/home/abonino/Proyectos/lldp/prueba.json"
