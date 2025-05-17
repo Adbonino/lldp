@@ -4,13 +4,19 @@
   connection: network_cli
 
   tasks:
-    - name: Ejecutar comando y parsear con ios_command + TextFSM
+    - name: Ejecutar comando con ios_command (sin parseo)
       cisco.ios.ios_command:
         commands:
           - show lldp neighbors detail
-        use_textfsm: yes
-      register: lldp_output
+      register: raw_output
 
-    - name: Mostrar resultado parseado
+    - name: Parsear salida con cli_parse y TextFSM
+      ansible.netcommon.cli_parse:
+        platform: cisco.ios
+        command: show lldp neighbors detail
+        output: "{{ raw_output.stdout[0] }}"
+      register: parsed_output
+
+    - name: Mostrar salida parseada
       debug:
-        var: lldp_output.stdout[0]
+        var: parsed_output.parsed
