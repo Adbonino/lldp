@@ -1,5 +1,5 @@
 ---
-- name: Obtener LLDP neighbors de switches Cisco
+- name: Obtener y parsear LLDP neighbors
   hosts: all
   gather_facts: no
   connection: network_cli
@@ -11,6 +11,14 @@
           - show lldp neighbors
       register: lldp_output
 
-    - name: Mostrar salida parseada con TextFSM
+    - name: Parsear salida con TextFSM (usando cli_parse)
+      ansible.netcommon.cli_parse:
+        command: show lldp neighbors
+        output: "{{ lldp_output.stdout[0] }}"
+        parser:
+          name: ansible.netcommon.textfsm
+      register: parsed_lldp
+
+    - name: Mostrar resultado parseado
       debug:
-        var: lldp_output.parsed_output
+        var: parsed_lldp.parsed
