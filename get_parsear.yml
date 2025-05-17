@@ -4,16 +4,19 @@
   gather_facts: no
   tasks:
     - name: Ejecutar show lldp neighbors
+      tags: test
       cisco.ios.ios_command:
         commands:
           - show lldp neighbors
       register: lldp_raw
 
     - name: Mostrar lista de vecinos LLDP parseados
+      tags: test
       debug:
         var: lldp_raw
 
     - name: Filtrar líneas con vecinos LLDP (líneas que contienen Eth)
+      tags: test
       set_fact:
         lldp_lines: >-
           {{
@@ -25,6 +28,7 @@
       register: lldp_filtrar
 
     - name: Mostrar lista de vecinos LLDP parseados
+      tags: test
       debug:
         var: lldp_filtrar
 
