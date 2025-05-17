@@ -7,19 +7,12 @@
     - ansible.netcommon
 
   tasks:
-    - name: Ejecutar comando LLDP
-      cisco.ios.ios_command:
-        commands:
-          - show lldp neighbors
-      register: lldp_output
-
-    - name: Parsear salida con TextFSM (usando cli_parse)
-      ansible.netcommon.cli_parse:
-        command: show lldp neighbors
-        output: "{{ lldp_output.stdout[0] }}"
-        parser:
-          name: ansible.netcommon.textfsm
-      register: parsed_lldp
+    
+    - name: Ejecutar comando y parsear con cli_command + TextFSM
+      ansible.netcommon.cli_command:
+        command: show lldp neighbors detail
+        use_textfsm: yes
+      register: parsed_output
 
     - name: Mostrar resultado parseado
       debug:
