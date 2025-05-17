@@ -1,6 +1,6 @@
 ---
 - name: Obtener y parsear vecinos LLDP
-  hosts: switches
+  hosts: all
   gather_facts: no
   tasks:
     - name: Ejecutar y parsear show lldp neighbors
