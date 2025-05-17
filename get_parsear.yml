@@ -9,6 +9,10 @@
           - show lldp neighbors
       register: lldp_raw
 
+     - name: Mostrar lista de vecinos LLDP parseados
+      debug:
+        var: lldp_raw
+
     - name: Filtrar líneas con vecinos LLDP (ignorando cabeceras)
       set_fact:
         lldp_lines: >-
