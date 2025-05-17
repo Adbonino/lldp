@@ -9,7 +9,7 @@
   tasks:
     
     - name: Ejecutar comando y parsear con cli_command + TextFSM
-      ansible.netcommon.cli_command:
+      cisco.ios.ios_command:
         command: show lldp neighbors detail
         use_textfsm: yes
       register: parsed_output
