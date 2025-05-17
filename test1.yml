@@ -7,7 +7,7 @@
     - name: Ejecutar comando show lldp neighbors detail
       cisco.ios.ios_command:
         commands:
-          - show lldp neighbors detail
+          - show lldp neighbors
       register: raw_output
 
     - name: Mostrar salida cruda
