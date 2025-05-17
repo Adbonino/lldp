@@ -2,6 +2,8 @@
   hosts: all
   gather_facts: no
   connection: network_cli
+  collections:
+    - ansible.netcommon
 
   tasks:
     - name: Ejecutar comando con ios_command (sin parseo)
