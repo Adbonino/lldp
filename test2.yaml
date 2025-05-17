@@ -20,4 +20,4 @@
 
     - name: Mostrar vecinos extraidos
       debug:
-        var: lldp_neigbors
+        var: lldp_neighbors
