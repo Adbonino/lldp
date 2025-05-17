@@ -1,0 +1,14 @@
+---
+- name: Inspeccionar salida show lldp neighbors
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ejecutar show lldp neighbors
+      cisco.ios.ios_command:
+        commands:
+          - show lldp neighbors
+      register: lldp_raw
+
+    - name: Mostrar salida cruda
+      debug:
+        var: lldp_raw.stdout[0]
