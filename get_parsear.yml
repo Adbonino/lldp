@@ -10,11 +10,11 @@
       register: lldp_raw
 
     - name: Filtrar líneas con vecinos LLDP (ignorando cabeceras)
-      set_fact:
+     set_fact:
         lldp_lines: >-
           {{
             lldp_raw.stdout[0].split('\n')
-            | select('match', '^[a-zA-Z0-9\\-\\.]+\\s+Eth\\d+/\\d+') 
+            | select('search', '^[\\w\\-.]+\\s+Eth\\d+/\\d+')
             | list
           }}
       register: lldp_filtrar
