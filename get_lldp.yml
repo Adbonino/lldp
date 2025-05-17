@@ -1,0 +1,13 @@
+- name: Obtener vecinos LLDP
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ejecutar show lldp neighbors
+      ansible.netcommon.cli_command:
+        command: show lldp neighbors detail
+      register: lldp_info
+
+    - name: Guardar resultado
+      copy:
+        content: "{{ lldp_info.stdout }}"
+        dest: "/tmp/{{ inventory_hostname }}_lldp.txt"
