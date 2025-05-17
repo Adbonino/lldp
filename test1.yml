@@ -1,0 +1,16 @@
+---
+- name: Obtener LLDP neighbors de switches Cisco
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: Ejecutar comando LLDP
+      cisco.ios.ios_command:
+        commands:
+          - show lldp neighbors
+      register: lldp_output
+
+    - name: Mostrar salida parseada con TextFSM
+      debug:
+        var: lldp_output.parsed_output
