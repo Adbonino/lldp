@@ -22,7 +22,7 @@
       set_fact:
         lldp_json: >-
           {{
-            lldp_lines | 
+            lldp_lines.stdout_lines[0] | 
             map('regex_search', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | 
             map('list') |
             map('zip', ['device_id', 'hold_time', 'port_id']) |
