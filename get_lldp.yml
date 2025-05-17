@@ -11,3 +11,4 @@
       copy:
         content: "{{ lldp_info.stdout }}"
         dest: "/tmp/{{ inventory_hostname }}_lldp.txt"
+      delegate_to: localhost
