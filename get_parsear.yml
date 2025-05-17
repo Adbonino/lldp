@@ -1,0 +1,18 @@
+---
+- name: Obtener y parsear vecinos LLDP
+  hosts: switches
+  gather_facts: no
+  tasks:
+    - name: Ejecutar y parsear show lldp neighbors
+      ansible.utils.cli_parse:
+        command: show lldp neighbors
+        parser:
+          name: ansible.netcommon.parsers.textfsm
+        set_fact: lldp_data
+      register: parsed_lldp
+
+    - name: Guardar LLDP parseado como JSON
+      copy:
+        content: "{{ parsed_lldp.ansible_facts.lldp_data | to_nice_json }}"
+        dest: "./lldp_parsed_{{ inventory_hostname }}.json"
+      delegate_to: localhost
