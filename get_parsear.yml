@@ -17,7 +17,8 @@
       set_fact:
         lldp_lines: >-
           {{
-            lldp_raw.stdout[0].split('\n')
+            (lldp_raw.stdout[0] | default('')) 
+            .split('\n') 
             | select('search', 'Eth')
             | list
           }}
