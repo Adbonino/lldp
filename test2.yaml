@@ -16,7 +16,7 @@
 
     - name: Extraer nombres de vecinos LLDP
       set_fact:
-         lldp_neighbors: "{{ lldp_output.stdout[0] | regex_findall('^(\\S+)', multiline=True) }}"
+         lldp_neighbors: "{{ lldp_output.stdout_lines[0][4:-1] }}"
 
     - name: Mostrar vecinos extraidos
       debug:
