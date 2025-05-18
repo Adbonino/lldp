@@ -1,10 +1,9 @@
 ---
 - name: Procesar LLDP info simple
   hosts: localhost
-  gather_facts: no
-
+  gather_facts: false
   vars:
-    lldp_lines:
+    raw_data:
       - "lab-bel-n5672-02     Eth1/1          120        B           Eth1/1            "
       - "lab-bel-n5672-02     Eth1/3          120        B           Eth1/3            "
       - "lab-bel-n5k.lab.local Eth1/11         120        B           Eth1/11           "
@@ -13,10 +12,10 @@
       - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
 
   tasks:
-    - name: Normalizar espacios y split
+    - name: Normalizar espacios y split en lista de listas
       set_fact:
-        parsed_list: "{{ parsed_list | default([]) + [ item | regex_replace('\\s+', ' ') | trim | split(' ') ] }}"
-      loop: "{{ lldp_lines }}"
+        parsed_list: "{{ parsed_list | default([]) + [item.split()] }}"
+      loop: "{{ raw_data }}"
 
     - name: Mostrar parsed_list
       debug:
@@ -24,18 +23,16 @@
 
     - name: Extraer solo los 3 primeros elementos de cada sublista
       set_fact:
-        shortened_list: "{{ parsed_list | map('regex_replace', '(\\S+) (\\S+) (\\S+).*', '\\1 \\2 \\3') | map('split', ' ') | list }}"
+        shortened_list: "{{ parsed_list | map('slice', 0, 3) | list }}"
+
+    - name: Mostrar shortened_list
+      debug:
+        var: shortened_list
 
     - name: Armar lista de diccionarios con campos device_id, port_id y hold_time
       set_fact:
-        lldp_dicts: >-
-          {{
-            shortened_list
-            | map('zip', ['device_id', 'port_id', 'hold_time'])
-            | map('items2dict')
-            | list
-          }}
+        final_list: "{{ shortened_list | map('zip', ['device_id', 'port_id', 'hold_time']) | map('items2dict') | list }}"
 
-    - name: Mostrar lista final de diccionarios
+    - name: Mostrar final_list
       debug:
-        var: lldp_dicts
+        var: final_list
