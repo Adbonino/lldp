@@ -1,5 +1,5 @@
 ---
-- name: Procesar LLDP info simple
+- name: Procesar LLDP info con todos los campos
   hosts: localhost
   gather_facts: false
   vars:
@@ -21,17 +21,9 @@
       debug:
         var: parsed_list
 
-    - name: Extraer solo los 3 primeros elementos de cada sublista
+    - name: Armar lista de diccionarios con todos los campos
       set_fact:
-        shortened_list: "{{ parsed_list | map('slice', 0, 3) | list }}"
-
-    - name: Mostrar shortened_list
-      debug:
-        var: shortened_list
-
-    - name: Armar lista de diccionarios con campos device_id, port_id y hold_time
-      set_fact:
-        final_list: "{{ shortened_list | map('zip', ['device_id', 'port_id', 'hold_time']) | map('items2dict') | list }}"
+        final_list: "{{ parsed_list | map('zip', ['device_id', 'port_id', 'hold_time', 'status', 'remote_port']) | map('items2dict') | list }}"
 
     - name: Mostrar final_list
       debug:
