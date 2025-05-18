@@ -1,8 +1,6 @@
-
 ---
-- name: Procesar salida LLDP
-  hosts: all
-  gather_facts: false
+- hosts: all
+  gather_facts: no
   vars:
     lldp_lines:
       - "lab-bel-n5672-02     Eth1/1          120        B           Eth1/1            "
@@ -13,18 +11,32 @@
       - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
 
   tasks:
-    - name: Aplicar regex_findall para extraer Device ID, Hold-time y Port ID
+
+    - name: Extraer device_id, hold_time y port_id con regex_findall
       set_fact:
         raw_matches: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
 
+    - name: Mostrar raw_matches (para debug)
+      debug:
+        var: raw_matches
+
     - name: Filtrar solo coincidencias no vacías
       set_fact:
-        filtered: "{{ raw_matches | reject('equalto', []) | list }}"
+        filtered: "{{ raw_matches | select('length') | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
-        lldp_json: "{{ filtered | map('first') | map('zip', ['device_id', 'hold_time', 'port_id']) | map('items2dict') | list }}"
+        lldp_json: >-
+          {{
+            filtered
+            | map('first')
+            | map('zip', ['device_id', 'hold_time', 'port_id'])
+            | map('map', 'reverse')
+            | map('list')
+            | map('items2dict')
+            | list
+          }}
 
-    - name: Mostrar JSON final
+    - name: Mostrar lista final de diccionarios
       debug:
         var: lldp_json
