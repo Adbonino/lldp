@@ -27,12 +27,14 @@
         lldp_json: >-
           {{
             lldp_lines
-            | map('regex_search', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)')
-            | map('list')
+            | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)')
+            | select('length')   # solo las que tienen match (lista no vacía)
+            | map('first')      # tomamos el primer match de cada línea
             | map('zip', ['device_id', 'hold_time', 'port_id'])
             | map('items2dict')
             | list
           }}
+
 
     - name: Mostrar JSON construido
       debug:
