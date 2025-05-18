@@ -8,8 +8,8 @@
       register: lldp_info
 
     - name: mostrar resultados
-      var:
-        lldp_info
+      debug:
+        var: lldp_info
 
     - name: Guardar resultado
       copy:
