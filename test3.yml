@@ -19,7 +19,8 @@
           {{
             raw_matches
             | map('zip', ['device_id', 'hold_time', 'port_id'])
-            | map('list')
+            | map('map', 'reverse')          # invierto (valor, clave) a (clave, valor)
+            | map('map', 'list')
             | map('items2dict')
             | list
           }}
