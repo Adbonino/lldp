@@ -15,7 +15,7 @@
 
     - name: Filtrar solo coincidencias no vacías (descartar listas vacías)
       set_fact:
-        filtered: "{{ raw_matches | select('length') | list }}"
+        filtered: "{{ raw_matches | select('truthy') | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
