@@ -14,5 +14,5 @@
     - name: Guardar resultado
       copy:
         content: "{{ lldp_info.stdout }}"
-        dest: "./lldp/{{ inventory_hostname }}_lldp.json"
+        dest: "./.lldp/{{ inventory_hostname }}_lldp.json"
       delegate_to: localhost
