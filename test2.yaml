@@ -17,6 +17,10 @@
     - name: Extraer nombres de vecinos LLDP
       set_fact:
          lldp_lines: "{{ lldp_output.stdout_lines[0][4:-1] }}"
+    
+    - name: Mostrar lineas
+      debug:
+        var: lldp_lines
 
     - name: Construir lista de diccionarios con campos Device ID, Hold-time y Port ID
       set_fact:
