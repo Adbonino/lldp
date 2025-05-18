@@ -1,3 +1,4 @@
+
 ---
 - name: Procesar salida LLDP
   hosts: all
@@ -12,25 +13,13 @@
       - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
 
   tasks:
-    - name: Mostrar lldp_lines
-      debug:
-        var: lldp_lines
-
     - name: Aplicar regex_findall para extraer Device ID, Hold-time y Port ID
       set_fact:
         raw_matches: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
 
-    - name: Mostrar raw_matches
-      debug:
-        var: raw_matches
-
     - name: Filtrar solo coincidencias no vacías
       set_fact:
-        filtered: "{{ raw_matches | select(lambda x: x | length > 0) | list }}"
-
-    - name: Mostrar filtered
-      debug:
-        var: filtered
+        filtered: "{{ raw_matches | reject('equalto', []) | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
