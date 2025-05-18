@@ -1,3 +1,4 @@
+
 ---
 - hosts: all
   gather_facts: no
@@ -16,9 +17,9 @@
       set_fact:
         raw_matches: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
 
-    - name: Filtrar solo coincidencias no vacías usando lambda
+    - name: Filtrar solo coincidencias no vacías (descartar listas vacías)
       set_fact:
-        filtered: "{{ raw_matches | select(lambda x: x is iterable and x|length > 0) | list }}"
+        filtered: "{{ raw_matches | reject('equalto', []) | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
