@@ -13,20 +13,26 @@
       - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
 
   tasks:
-
-    - name: Parsear líneas y armar lista de diccionarios
+    - name: Normalizar espacios y split
       set_fact:
-        lldp_parsed: >-
+        parsed_list: "{{ parsed_list | default([]) + [ item | regex_replace('\\s+', ' ') | trim | split(' ') ] }}"
+      loop: "{{ lldp_lines }}"
+
+    - name: Mostrar parsed_list
+      debug:
+        var: parsed_list
+
+    - name: Armar lista de diccionarios con campos device_id, port_id y hold_time
+      set_fact:
+        lldp_dicts: >-
           {{
-            lldp_lines
-            | map('regex_replace', '\\s+', ' ')    # Normalizo espacios a uno solo
-            | map('trim')
-            | map('split', ' ')
-            | map('list')
-            | map('community.general.dict_kv', ['device_id', 'port_id', 'hold_time', 'flags', 'port_id2'])
+            parsed_list
+            | map('extract', [0,1,2])
+            | map('zip', ['device_id', 'port_id', 'hold_time'])
+            | map('items2dict')
             | list
           }}
 
-    - name: Mostrar resultado
+    - name: Mostrar lista final de diccionarios
       debug:
-        var: lldp_parsed
+        var: lldp_dicts
