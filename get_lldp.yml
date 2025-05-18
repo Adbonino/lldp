@@ -10,5 +10,5 @@
     - name: Guardar resultado
       copy:
         content: "{{ lldp_info.stdout }}"
-        dest: "/home/abonino/Proyectos/lldp/.lldp/{{ inventory_hostname }}_lldp.txt"
+        dest: "./{{ inventory_hostname }}_lldp.txt"
       delegate_to: localhost
