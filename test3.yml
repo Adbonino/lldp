@@ -1,5 +1,5 @@
 ---
-- name: Procesar LLDP info con formato de columnas y espacios
+- name: Procesar LLDP info simple
   hosts: localhost
   gather_facts: no
 
@@ -14,26 +14,19 @@
 
   tasks:
 
-    - name: Extraer device_id, hold_time y port_id con regex
+    - name: Parsear líneas y armar lista de diccionarios
       set_fact:
-        lldp_data: >-
+        lldp_parsed: >-
           {{
             lldp_lines
-            | map('regex_search', '^(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+\\S+\\s+(\\S+)', '\\1,\\3,\\4')
+            | map('regex_replace', '\\s+', ' ')    # Normalizo espacios a uno solo
+            | map('trim')
+            | map('split', ' ')
+            | map('list')
+            | map('community.general.dict_kv', ['device_id', 'port_id', 'hold_time', 'flags', 'port_id2'])
             | list
           }}
 
-    - name: Convertir las cadenas extraídas a diccionarios
-      set_fact:
-        lldp_json: >-
-          {{
-            lldp_data
-            | map('split', ',')
-            | map('zip', ['device_id', 'hold_time', 'port_id'])
-            | map('items2dict')
-            | list
-          }}
-
-    - name: Mostrar resultado final
+    - name: Mostrar resultado
       debug:
-        var: lldp_json
+        var: lldp_parsed
