@@ -16,13 +16,9 @@
       set_fact:
         raw_matches: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
 
-    - name: Mostrar raw_matches (para debug)
-      debug:
-        var: raw_matches
-
-    - name: Filtrar solo coincidencias no vacías
+    - name: Filtrar solo coincidencias no vacías usando lambda
       set_fact:
-        filtered: "{{ raw_matches | select('length') | list }}"
+        filtered: "{{ raw_matches | select(lambda x: x is iterable and x|length > 0) | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
