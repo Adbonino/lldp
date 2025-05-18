@@ -1,38 +1,34 @@
 ---
-- hosts: all
+- name: Extraer y procesar LLDP info
+  hosts: all
   gather_facts: no
+
   vars:
-    lldp_lines:
-      - "lab-bel-n5672-02     Eth1/1          120        B           Eth1/1            "
-      - "lab-bel-n5672-02     Eth1/3          120        B           Eth1/3            "
-      - "lab-bel-n5k.lab.localEth1/11         120        B           Eth1/11           "
-      - "UCS-LAB-FI-A         Eth1/19         120        B           Eth1/19           "
-      - "UCS-LAB-FI-B         Eth1/20         120        B           Eth1/19           "
-      - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
+    lldp_output: |
+      lab-bel-n5672-02 120 Eth1/1
+      lab-bel-n5672-02 120 Eth1/3
 
   tasks:
-
     - name: Extraer device_id, hold_time y port_id con regex_findall
       set_fact:
-        raw_matches: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
+        raw_matches: "{{ lldp_output | regex_findall('([\\w\\-]+)\\s+(\\d+)\\s+(Eth[\\w/]+)') }}"
 
     - name: Filtrar solo coincidencias no vacías (descartar listas vacías)
       set_fact:
-        filtered: "{{ raw_matches | reject('equalto', []) | list }}"
+        filtered: "{{ raw_matches | select('length') | list }}"
 
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
         lldp_json: >-
           {{
             filtered
-            | map('first')
             | map('zip', ['device_id', 'hold_time', 'port_id'])
-            | map('map', 'reverse')                # intercambiar para tener (clave, valor)
-            | map('map', 'tuple')                  # convertir listas a tuplas (clave, valor)
-            | map('items2dict')                    # ahora sí convertir a dict
+            | map('map', 'reverse')
+            | map('map', 'list')
+            | map('items2dict')
             | list
           }}
 
-    - name: Mostrar lista final de diccionarios
+    - name: Mostrar resultado final
       debug:
         var: lldp_json
