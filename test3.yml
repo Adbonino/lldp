@@ -1,0 +1,30 @@
+- hosts: all
+  gather_facts: no
+  vars:
+    lldp_lines:
+      - "lab-bel-n5672-02     Eth1/1          120        B           Eth1/1            "
+      - "lab-bel-n5672-02     Eth1/3          120        B           Eth1/3            "
+      - "lab-bel-n5k.lab.localEth1/11         120        B           Eth1/11           "
+      - "UCS-LAB-FI-A         Eth1/19         120        B           Eth1/19           "
+      - "UCS-LAB-FI-B         Eth1/20         120        B           Eth1/19           "
+      - "lab-bsas-leaf101     Eth1/25         120        BR          Eth1/47           "
+  tasks:
+    - name: Mostrar regex_findall
+      debug:
+        msg: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | list }}"
+
+    - name: Filtrar solo coincidencias no vacías
+      set_fact:
+        filtered: "{{ lldp_lines | map('regex_findall', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | select('length') | list }}"
+
+    - name: Mostrar filtered
+      debug:
+        var: filtered
+
+    - name: Convertir a dicts
+      set_fact:
+        lldp_json: "{{ filtered | map('first') | map('zip', ['device_id', 'hold_time', 'port_id']) | map('items2dict') | list }}"
+
+    - name: Mostrar resultado final
+      debug:
+        var: lldp_json
