@@ -13,18 +13,13 @@
       set_fact:
         raw_matches: "{{ lldp_output | regex_findall('([\\w\\-]+)\\s+(\\d+)\\s+(Eth[\\w/]+)') }}"
 
-    - name: Filtrar solo coincidencias no vacías (descartar listas vacías)
-      set_fact:
-        filtered: "{{ raw_matches | select('truthy') | list }}"
-
     - name: Construir lista de diccionarios con device_id, hold_time y port_id
       set_fact:
         lldp_json: >-
           {{
-            filtered
+            raw_matches
             | map('zip', ['device_id', 'hold_time', 'port_id'])
-            | map('map', 'reverse')
-            | map('map', 'list')
+            | map('list')
             | map('items2dict')
             | list
           }}
