@@ -1,4 +1,3 @@
-
 ---
 - hosts: all
   gather_facts: no
@@ -28,9 +27,9 @@
             filtered
             | map('first')
             | map('zip', ['device_id', 'hold_time', 'port_id'])
-            | map('map', 'reverse')
-            | map('list')
-            | map('items2dict')
+            | map('map', 'reverse')                # intercambiar para tener (clave, valor)
+            | map('map', 'tuple')                  # convertir listas a tuplas (clave, valor)
+            | map('items2dict')                    # ahora sí convertir a dict
             | list
           }}
 
