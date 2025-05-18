@@ -9,7 +9,7 @@
 
     - name: mostrar resultados
       debug:
-        var: lldp_info.jon
+        var: lldp_info.json
 
     - name: Guardar resultado
       copy:
