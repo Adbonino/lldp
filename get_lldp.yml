@@ -4,7 +4,7 @@
   tasks:
     - name: Ejecutar show lldp neighbors
       ansible.netcommon.cli_command:
-        command: show lldp neighbors detail
+        command: show lldp neighbors | json
       register: lldp_info
 
     - name: Guardar resultado
