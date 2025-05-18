@@ -7,6 +7,10 @@
         command: show lldp neighbors | json
       register: lldp_info
 
+    - name: mostrar resultados
+      var:
+        lldp_info
+
     - name: Guardar resultado
       copy:
         content: "{{ lldp_info.stdout }}"
