@@ -24,7 +24,7 @@
 
     - name: Extraer solo los 3 primeros elementos de cada sublista
       set_fact:
-        shortened_list: "{{ parsed_list | map('slice', 0, 3) | list }}"
+        shortened_list: "{{ parsed_list | map('regex_replace', '(\\S+) (\\S+) (\\S+).*', '\\1 \\2 \\3') | map('split', ' ') | list }}"
 
     - name: Armar lista de diccionarios con campos device_id, port_id y hold_time
       set_fact:
