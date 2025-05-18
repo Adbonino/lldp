@@ -1,5 +1,5 @@
 - name: Obtener y parsear LLDP neighbors sin Python
-  hosts: all
+  hosts: 10.54.100.248
   gather_facts: no
   connection: network_cli
 
@@ -22,7 +22,7 @@
       set_fact:
         lldp_json: >-
           {{
-            lldp_lines[0] | 
+            lldp_lines | 
             map('regex_search', '^(\\S+)\\s+\\S+\\s+(\\d+)\\s+\\S+\\s+(\\S+)') | 
             map('list') |
             map('zip', ['device_id', 'hold_time', 'port_id']) |
